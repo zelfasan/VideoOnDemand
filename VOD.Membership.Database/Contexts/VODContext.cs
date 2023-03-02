@@ -25,6 +25,17 @@ namespace VOD.Membership.Database.Contexts
         {
             base.OnModelCreating(builder);
 
+            builder.Entity<Film>(entity =>
+            {
+                entity.HasMany(d => d.SimilarFilms)
+                .WithOne(p => p.ParentFilm)
+                .HasForeignKey(d => d.ParentFilmId)
+                .OnDelete(DeleteBehavior.ClientSetNull);
+                 entity.HasMany(d => d.Genres)
+                .WithMany(p => p.Films)
+                .UsingEntity<FilmGenre>()
+                .ToTable("FilmGenres");
+            });
             builder.Entity<FilmGenre>().HasKey(fg => new { fg.FilmId, fg.GenreId });
             builder.Entity<SimilarFilms>().HasKey(sf => new { sf.ParentFilmId, sf.SimilarFilmId });
 

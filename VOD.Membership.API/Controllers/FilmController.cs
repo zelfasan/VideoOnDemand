@@ -64,13 +64,13 @@ namespace VOD.Membership.API.Controllers
             {
                 if (dto == null) return Results.BadRequest();
 
-                var course = await _db.AddAsync<Film, FilmCreateDTO>(dto);
+                var film = await _db.AddAsync<Film, FilmCreateDTO>(dto);
 
                 var success = await _db.SaveChangesAsync();
 
                 if (!success) return Results.BadRequest();
 
-                return Results.Created(_db.GetURI<Film>(course), course);
+                return Results.Created(_db.GetURI<Film>(film), film);
             }
             catch
             {

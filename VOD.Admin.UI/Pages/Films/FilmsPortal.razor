@@ -1,4 +1,5 @@
-﻿@inject IAdminService AdminService
+﻿@using static VOD.Admin.UI.Pages.Films.ChangeFilm;
+@inject IAdminService AdminService
 
 @if (!string.IsNullOrEmpty(Alert))
 {
@@ -16,7 +17,7 @@
 }
 @if (Navigation == PageType.Delete || Navigation == PageType.Edit)
 {
-    <ChangeFilm Page="@Navigation" OnChange="OnChange" Model="Film"></ChangeFilm>
+    <ChangeFilm Page="@Navigation" OnChange="OnChange" CtxModel="CtxModel"></ChangeFilm>
 }
 
 <div class="d-flex me-1">
@@ -28,10 +29,11 @@
 <FilmsIndex OnClick="OnClick" Model="Model"></FilmsIndex>
 
 @code {
-	List<FilmDTO> Model { get; set; } = new();
+    List<FilmDTO> Model { get; set; } = new();
     string Alert { get; set; } = "";
     string Navigation { get; set; } = PageType.Index;
     public FilmDTO Film { get; set; } = new();
+    public ContextModel CtxModel { get; set; } = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -46,7 +48,11 @@
     async Task OnClick(ClickModel model)
     {
         if (model.PageType.Equals(PageType.Edit) || model.PageType.Equals(PageType.Delete))
+        {
             Film = await AdminService.SingleAsync<FilmDTO>($"film/{model.Id}") ?? new();
+            CtxModel.Model = Film;
+        }
+        
 
         ChangePageType(model.PageType);
     }

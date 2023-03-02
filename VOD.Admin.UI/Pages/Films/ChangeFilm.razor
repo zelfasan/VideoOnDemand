@@ -1,36 +1,36 @@
 ﻿@inject IAdminService AdminService
 
 <div class="d-xl-flex justify-content-center">
-    <EditForm Model="@Model" OnValidSubmit="@OnFormSubmit" class="mb-5 border border-1 border-secondary p-2 w-25">
+    <EditForm Model="@EditContext" OnValidSubmit="@OnFormSubmit" class="mb-5 border border-1 border-secondary p-2 w-25">
         <DataAnnotationsValidator />
         <h4>@Page Film</h4>
         <div class="mb-3">
             @if (Page.Equals(PageType.Delete))
             {
-                <InputText id="title" class="form-control me-2" @bind-Value="Model.Title" disabled placeholder="Title"></InputText>
+                <InputText id="title" class="form-control me-2" @bind-Value="CtxModel.Model.Title" disabled placeholder="Title"></InputText>
             }
             else
             {
-                <InputText id="title" class="form-control me-2" @bind-Value="Model.Title" placeholder="Title"></InputText>
+                <InputText id="title" class="form-control me-2" @bind-Value="CtxModel.Model.Title" placeholder="Title"></InputText>
             }
-            <ValidationMessage For="@(() => Model.Title)" />
+            <ValidationMessage For="@(() => CtxModel.Model.Title)" />
         </div>
         @if (!Page.Equals(PageType.Delete))
         {
             <div class="mb-3">
-                <InputText id="description" class="form-control me-2" @bind-Value="Model.Description" placeholder="Description"></InputText>
-                <ValidationMessage For="@(() => Model.Description)" />
+                <InputText id="description" class="form-control me-2" @bind-Value="CtxModel.Model.Description" placeholder="Description"></InputText>
+                <ValidationMessage For="@(() => CtxModel.Model.Description)" />
             </div>
             <div class="mb-3">
-                <InputText id="film-url" class="form-control me-2" @bind-Value="Model.FilmUrl" placeholder="Film Url"></InputText>
-                <ValidationMessage For="@(() => Model.FilmUrl)" />
+                <InputText id="film-url" class="form-control me-2" @bind-Value="CtxModel.Model.FilmUrl" placeholder="Film Url"></InputText>
+                <ValidationMessage For="@(() => CtxModel.Model.FilmUrl)" />
             </div>
             <div class="mb-3">
-                <InputDate id="released" class="form-control me-2" @bind-Value="Model.Released" placeholder="Released"></InputDate>
-                <ValidationMessage For="@(() => Model.Released)" />
+                <InputDate id="released" class="form-control me-2" @bind-Value="CtxModel.Model.Released" placeholder="Released"></InputDate>
+                <ValidationMessage For="@(() => CtxModel.Model.Released)" />
             </div>
 
-            <InputSelect @bind-Value="Model.DirectorId" class="form-control mb-3">
+            <InputSelect @bind-Value="CtxModel.Model.DirectorId" class="form-control mb-3">
                 <option value=0>Director ...</option>
                 @foreach (var Director in Directors)
                 {
@@ -38,26 +38,42 @@
                 }
             </InputSelect>
 
+            <InputSelect @bind-Value="CtxModel.SelectedValues" class="form-control mb-3">
+                <option value=0>Genre ...</option>
+                @foreach (var Genre in Genres)
+                {
+                    <option value="@Genre.Id">@Genre.Name</option>
+                }
+            </InputSelect>
+
             <div class="mb-3">
                 <label>
-                    <InputCheckbox @bind-Value="Model.Free" />
+                    <InputCheckbox @bind-Value="CtxModel.Model.Free" />
                     Free Film
                 </label>
             </div>
-        }f
+        }
         <button type="submit" class="btn btn-@(Page.Equals(PageType.Delete) ? "danger" : "primary") rounded-0">@Page</button>
     </EditForm>
 </div>
 
 @code {
-    [Parameter] public FilmDTO Model { get; set; } = new();
+    EditContext EditContext { get; set; }
+    [Parameter] public ContextModel CtxModel { get; set; } = new();
     [Parameter] public string Page { get; set; } = string.Empty;
     [Parameter] public EventCallback<string> OnChange { get; set; }
     List<DirectorDTO> Directors { get; set; } = new();
     List<GenreDTO> Genres { get; set; } = new();
+    
+    public class ContextModel
+    {
+        public int[] SelectedValues { get; set; } = new int[] { };
+        public FilmDTO Model { get; set; } = new();
+    }
 
     protected override async Task OnInitializedAsync()
     {
+        EditContext = new(CtxModel);
         Directors = await AdminService.GetAsync<DirectorDTO>("Director");
         Genres = await AdminService.GetAsync<GenreDTO>("Genre");
     }
@@ -67,15 +83,24 @@
         try
         {
             if (Page.Equals(PageType.Create))
-                await AdminService.CreateAsync<FilmDTO>("film", Model);
+            {
+                await AdminService.CreateAsync<FilmDTO>("film", CtxModel.Model);
+            }
+
             else if (Page.Equals(PageType.Edit))
-                await AdminService.EditAsync<FilmDTO>($"film/{Model.Id}", Model);
+            {
+                await AdminService.EditAsync<FilmDTO>($"film/{CtxModel.Model.Id}", CtxModel.Model);
+            }
+
             else if (Page.Equals(PageType.Delete))
-                await AdminService.DeleteAsync<FilmDTO>($"film/{Model.Id}");
+            {
+                await AdminService.DeleteAsync<FilmDTO>($"film/{CtxModel.Model.Id}");
+            }
+            
 
             await OnChange.InvokeAsync("");
         }
-        catch
+        catch(Exception ex)
         {
             await OnChange.InvokeAsync("Couldn't create/edit/delete the film.");
         }

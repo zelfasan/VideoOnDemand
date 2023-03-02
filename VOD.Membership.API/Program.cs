@@ -55,18 +55,20 @@ static void ConfigureAutomapper(IServiceCollection services)
 {
     var config = new MapperConfiguration(cfg =>
     {
+        cfg.CreateMap<SimilarFilms, SimilarFilmsDTO>().ReverseMap();
         cfg.CreateMap<Film, FilmDTO>().ReverseMap();
         cfg.CreateMap<FilmEditDTO, Film>()
             .ForMember(dest => dest.Director, src => src.Ignore())
-            .ForMember(dest => dest.Genres, src => src.Ignore());
+            .ForMember(dest => dest.Genres, src => src.Ignore())
+            .ForMember(dest => dest.SimilarFilms, src => src.Ignore());
 
         cfg.CreateMap<FilmCreateDTO, Film>()
             .ForMember(dest => dest.Director, src => src.Ignore())
-            .ForMember(dest => dest.Genres, src => src.Ignore());
+            .ForMember(dest => dest.Genres, src => src.Ignore())
+            .ForMember(dest => dest.SimilarFilms, src => src.Ignore());
         cfg.CreateMap<Genre, GenreDTO>().ReverseMap();
         cfg.CreateMap<Director, DirectorDTO>().ReverseMap();
         cfg.CreateMap<FilmGenre, FilmGenreDTO>().ReverseMap();
-        cfg.CreateMap<SimilarFilms, SimilarFilmsDTO>().ReverseMap();
     });
     var mapper = config.CreateMapper();
     services.AddSingleton(mapper);
