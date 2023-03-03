@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using VOD.Common.DTOs;
@@ -63,10 +64,18 @@ namespace VOD.Membership.API.Controllers
             try
             {
                 if (dto == null) return Results.BadRequest();
-
+                
                 var film = await _db.AddAsync<Film, FilmCreateDTO>(dto);
+                
 
                 var success = await _db.SaveChangesAsync();
+
+                var x = (await _db.GetAsync<Film, FilmDTO>()).Last();
+                foreach (var gen in dto.Genres)
+                {
+                    await _db.AddAsync<FilmGenre, FilmGenreDTO>(new FilmGenreDTO(x.Id, gen.Id));
+                    await _db.SaveChangesAsync();
+                }
 
                 if (!success) return Results.BadRequest();
 
@@ -116,6 +125,8 @@ namespace VOD.Membership.API.Controllers
         {
             try
             {
+                _db.Include<Film>(); 
+                _db.Include<FilmGenre>();
                 var success = await _db.DeleteAsync<Film>(id);
 
                 if (!success) return Results.NotFound();

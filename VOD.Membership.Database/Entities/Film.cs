@@ -27,6 +27,6 @@ namespace VOD.Membership.Database.Entities
         public virtual Director Director { get; set; }
         public virtual ICollection<Genre> Genres { get; set; }
         public virtual ICollection<SimilarFilms> SimilarFilms { get; set;}
-        public virtual ICollection<FilmGenre> FilmGenres { get; set; }
+        //public virtual ICollection<FilmGenre> FilmGenres { get; set; }
     }
 }

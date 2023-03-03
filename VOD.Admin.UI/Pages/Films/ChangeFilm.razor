@@ -91,7 +91,8 @@
             else if (Page.Equals(PageType.Edit))
             {
                 CtxModel.Model.Genres = Genres.Where(gen => CtxModel.SelectedValues.Contains(gen.Id)).ToList();
-                await AdminService.EditAsync<FilmDTO>($"film/{CtxModel.Model.Id}", CtxModel.Model);
+                await AdminService.DeleteAsync<FilmDTO>($"film/{CtxModel.Model.Id}");
+                await AdminService.CreateAsync<FilmDTO>("film", CtxModel.Model);
             }
 
             else if (Page.Equals(PageType.Delete))
