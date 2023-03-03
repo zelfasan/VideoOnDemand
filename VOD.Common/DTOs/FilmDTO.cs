@@ -30,6 +30,7 @@ namespace VOD.Common.DTOs
         public DateTime Released { get; set; }
         public int DirectorId { get; set; }
         public bool Free { get; set; }
+        public List<GenreDTO> Genres { get; set; } = new();
     }
 
     public class FilmEditDTO : FilmCreateDTO

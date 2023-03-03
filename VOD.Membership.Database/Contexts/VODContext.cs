@@ -30,7 +30,7 @@ namespace VOD.Membership.Database.Contexts
                 entity.HasMany(d => d.SimilarFilms)
                 .WithOne(p => p.ParentFilm)
                 .HasForeignKey(d => d.ParentFilmId)
-                .OnDelete(DeleteBehavior.ClientSetNull);
+                .OnDelete(DeleteBehavior.Cascade);
                  entity.HasMany(d => d.Genres)
                 .WithMany(p => p.Films)
                 .UsingEntity<FilmGenre>()
@@ -39,10 +39,10 @@ namespace VOD.Membership.Database.Contexts
             builder.Entity<FilmGenre>().HasKey(fg => new { fg.FilmId, fg.GenreId });
             builder.Entity<SimilarFilms>().HasKey(sf => new { sf.ParentFilmId, sf.SimilarFilmId });
 
-            foreach (var relationship in builder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()))
-            {
-                relationship.DeleteBehavior = DeleteBehavior.Restrict;
-            }
+            //foreach (var relationship in builder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()))
+            //{
+            //    relationship.DeleteBehavior = DeleteBehavior.Restrict;
+            //}
         }
     }
 }

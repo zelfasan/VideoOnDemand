@@ -64,7 +64,7 @@
     [Parameter] public EventCallback<string> OnChange { get; set; }
     List<DirectorDTO> Directors { get; set; } = new();
     List<GenreDTO> Genres { get; set; } = new();
-    
+
     public class ContextModel
     {
         public int[] SelectedValues { get; set; } = new int[] { };
@@ -84,11 +84,13 @@
         {
             if (Page.Equals(PageType.Create))
             {
+                CtxModel.Model.Genres = Genres.Where(gen => CtxModel.SelectedValues.Contains(gen.Id)).ToList();
                 await AdminService.CreateAsync<FilmDTO>("film", CtxModel.Model);
             }
 
             else if (Page.Equals(PageType.Edit))
             {
+                CtxModel.Model.Genres = Genres.Where(gen => CtxModel.SelectedValues.Contains(gen.Id)).ToList();
                 await AdminService.EditAsync<FilmDTO>($"film/{CtxModel.Model.Id}", CtxModel.Model);
             }
 
